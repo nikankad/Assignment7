@@ -1,7 +1,7 @@
 public class myAVL {
    Node root;
 
-
+   //returns height of selected node (N : Node)
    int height(Node N){
     if(N == null){
         return 0;
@@ -10,123 +10,114 @@ public class myAVL {
     return N.height;
    }
 
+//  returns max of 2 numbers (a, b) : int
    int max(int a, int b){
     return(a>b) ? a:b;
    }
 
+   // updates height of Node N
    private void updateHeight(Node N){
-
     int leftChildHeight = height(N.left);
     int rightChildHeight = height(N.right);
 
     N.height = max(leftChildHeight, rightChildHeight) + 1;
    }
 
+   // Balance factor (R, L, 2R, 2L)
    public int balanceFactor(Node N){
-        return height(N.right) - height(N.left);
+        return height(N.left) - height(N.right);
    }
 
-
+// rotates node N right
    private Node rotateRight(Node N){
        Node leftChild = N.left;
-
-       N.left = leftChild.right;
-
-       leftChild.right = N;
-
-       updateHeight(N);
-       updateHeight(leftChild);
-
+//diy
        return leftChild;
    }
-
+//  rotates node N left
    private Node rotateLeft(Node N){
        Node rightChild = N.right;
-
-       N.right = rightChild.left;
-
-       rightChild.left = N;
-
-       updateHeight(N);
-       updateHeight(rightChild);
-
+//write yourself
        return rightChild;
    }
+// rebalences subtree from node 
+    private Node rebalance(Node N) {
+        int balanceFactor = balanceFactor(N);
 
-    private Node rebalance(Node node) {
-        int balanceFactor = balanceFactor(node);
-
-        // Left-heavy?
+        // Left-heavy
         if (balanceFactor < -1) {
-            if (balanceFactor(node.left) <= 0) {    // Case 1
+            if (balanceFactor(N.left) <= 0) {    // Case 1
                 // Rotate right
-                node = rotateRight(node);
+                N = rotateRight(N);
             } else {                                // Case 2
                 // Rotate left-right
-                node.left = rotateLeft(node.left);
-                node = rotateRight(node);
+                N.left = rotateLeft(N.left);
+                N = rotateRight(N);
             }
         }
 
         // Right-heavy?
         if (balanceFactor > 1) {
-            if (balanceFactor(node.right) >= 0) {    // Case 3
+            if (balanceFactor(N.right) >= 0) {    // Case 3
                 // Rotate left
-                node = rotateLeft(node);
+                N = rotateLeft(N);
             } else {                                 // Case 4
                 // Rotate right-left
-                node.right = rotateRight(node.right);
-                node = rotateLeft(node);
+                N.right = rotateRight(N.right);
+                N = rotateLeft(N);
             }
         }
 
-        return node;
+        return N;
     }
 
 
 
-    Node insert(Node N, int data){
+    Node insert(Node N, int data) {
+        // Step 1: Perform the normal BST insertion
+        if (N == null) {
+            return new Node(data);
+        }
 
-       if(N == null){
-           return new Node(data);
-       }
+        if (data < N.data) {
+            N.left = insert(N.left, data);
+        } else if (data > N.data) {
+            N.right = insert(N.right, data);
+        } else {
+            // Duplicate data is not allowed in AVL tree, so do nothing
+            return N;
+        }
 
-       if(data < N.data) {
-           N.left = insert(N.left, data);
-       } else if (data > N.data) {
-           N.right = insert(N.right, data);
-       }else{
-           return N;
-       }
+        // Step 2: Update height of the current node
+        N.height = 1 + max(height(N.left), height(N.right));
 
-       N.height = 1 + max(height(N.left), height(N.right));
+        // Step 3: Get the balance factor of this node to check if it is unbalanced
+        int balanceFactor = balanceFactor(N);
 
-
-       int balance = balanceFactor(N);
-
-        // are 4 cases Left Left Case
-        if (balance > 1 && data < N.left.data)
+        // Step 4: Perform rotations if the node is unbalanced
+        // Left Heavy (Left-Left case)
+        if (balanceFactor > 1 && data < N.left.data) {
             return rotateRight(N);
-
-        // Right Right Case
-        if (balance < -1 && data > N.right.data)
+        }
+        // Right Heavy (Right-Right case)
+        if (balanceFactor < -1 && data > N.right.data) {
             return rotateLeft(N);
-
-        // Left Right Case
-        if (balance > 1 && data > N.left.data) {
+        }
+        // Left Heavy (Left-Right case)
+        if (balanceFactor > 1 && data > N.left.data) {
             N.left = rotateLeft(N.left);
             return rotateRight(N);
         }
-
-        // Right Left Case
-        if (balance < -1 && data < N.right.data) {
+        // Right Heavy (Right-Left case)
+        if (balanceFactor < -1 && data < N.right.data) {
             N.right = rotateRight(N.right);
             return rotateLeft(N);
         }
 
-
+        // If the node is balanced, return it
         return N;
     }
+
 
 
     void preOrder(Node N) {
@@ -150,7 +141,7 @@ public class myAVL {
         tree.root = tree.insert(tree.root, 40);
         tree.root = tree.insert(tree.root, 50);
         tree.root = tree.insert(tree.root, 25);
-
+        
         /* The constructed AVL Tree would be
              30
             /  \
