@@ -24,6 +24,10 @@ public class SaleRecord {
 
     }
 
+    
+    /** 
+     * @return String
+     */
     public String getSalePerson() {
         return salesPerson;
     }

@@ -2,20 +2,21 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.TreeMap;
 
-public class program7 extends myAVL {
-    program7(int myLimit) {
-        super(myLimit);
-        // TODO Auto-generated constructor stub
-    }
-
+public class program7 {
+    
+    /** 
+     * @param args
+     * @throws ParseException
+     */
     public static void main(String[] args) throws ParseException {
 
         String csvFile = "src/small_sample.csv"; // Path to your CSV file
         String line;
 
-        myAVL tree = new myAVL(10);
-        // /* Constructing tree given in the above figure */
+        // TreeMap to store Car Make as key and its corresponding AVL tree as value
+        TreeMap<String, myAVL> carMakeTrees = new TreeMap<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
             br.readLine(); // Skip the header row
@@ -27,26 +28,27 @@ public class program7 extends myAVL {
                         data[4], Integer.parseInt(data[5]), Double.parseDouble(data[6]), Double.parseDouble(data[7]),
                         Double.parseDouble(data[8]));
 
-                tree.root = tree.insert(tree.root, saleRecord);
-                // System.out.println(tree.root.toString());
+                String carMake = saleRecord.getMake();
 
+                // Check if the Car Make AVL tree already exists, if not, create a new one
+                if (!carMakeTrees.containsKey(carMake)) {
+                    carMakeTrees.put(carMake, new myAVL(10));
+                }
+
+                // Insert the SaleRecord into the corresponding AVL tree based on Car Make
+                myAVL tree = carMakeTrees.get(carMake);
+                tree.root = tree.insert(tree.root, saleRecord);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        // /* The constructed AVL Tree would be
-        // 30
-        // / \
-        // 20 40
-        // / \ \
-        // 10 25 50
-        // */
-        System.out.println("Preorder traversal" +
-                " of constructed tree is : ");
-        tree.preOrder(tree.root);
-
+        // Print Sale records for each Car Make
+        for (String carMake : carMakeTrees.keySet()) {
+            System.out.println("Sale records for Car Make: " + carMake);
+            myAVL tree = carMakeTrees.get(carMake);
+            tree.preOrder(tree.root);
+            System.out.println("-------------");
+        }
     }
-    //
-
 }

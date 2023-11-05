@@ -1,17 +1,39 @@
+
+/**
+ * AVL tree implementation for storing SaleRecord objects based on their dates.
+ * Author: Nikan Kadkhodazadeh
+ * Version: 1
+ * Github: https://github.com/nikankad/Assignment7
+ */
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 class myAVL {
     Node root;
-
     int limit;
 
+    /**
+     * Constructor to create an AVL tree with a specified balance limit.
+     *
+     * @param myLimit the balance limit for the AVL tree.
+     */
     myAVL(int myLimit) {
         limit = myLimit;
     }
 
-    // return true if date a is earlier than b
+    /**
+     * Compares two date strings and returns true if the first date is earlier than
+     * the second date.
+     *
+     * @param a the first date string.
+     * @param b the second date string.
+     * @return true if the first date is earlier than the second date, false
+     *         otherwise.
+     * @throws ParseException if the input strings are not in the correct date
+     *                        format.
+     */
     public boolean compare(String a, String b) throws ParseException {
 
         try {
@@ -20,10 +42,8 @@ class myAVL {
             Date date2 = dateFormat.parse(b);
 
             if (date1.before(date2)) {
-                // System.out.println(true);
                 return true;
             } else {
-                // System.out.println(false);
                 return false;
             }
         } catch (ParseException e) {
@@ -33,7 +53,12 @@ class myAVL {
         }
     }
 
-    // A utility function to get the height of the tree
+    /**
+     * Utility method to get the height of the given node.
+     *
+     * @param N the node to get the height from.
+     * @return the height of the node.
+     */
     int height(Node N) {
         if (N == null)
             return 0;
@@ -41,13 +66,23 @@ class myAVL {
         return N.height;
     }
 
-    // A utility function to get maximum of two integers
+    /**
+     * Utility method to get the maximum of two integers.
+     *
+     * @param a the first integer.
+     * @param b the second integer.
+     * @return the maximum of the two integers.
+     */
     int max(int a, int b) {
         return (a > b) ? a : b;
     }
 
-    // A utility function to right rotate subtree rooted with y
-    // See the diagram given above.
+    /**
+     * Performs right rotation on the subtree rooted with node y.
+     *
+     * @param y the root node of the subtree.
+     * @return the new root of the subtree after rotation.
+     */
     Node rightRotate(Node y) {
         Node x = y.left;
         Node T2 = x.right;
@@ -64,8 +99,12 @@ class myAVL {
         return x;
     }
 
-    // A utility function to left rotate subtree rooted with x
-    // See the diagram given above.
+    /**
+     * Performs left rotation on the subtree rooted with node x.
+     *
+     * @param x the root node of the subtree.
+     * @return the new root of the subtree after rotation.
+     */
     Node leftRotate(Node x) {
         Node y = x.right;
         Node T2 = y.left;
@@ -83,7 +122,12 @@ class myAVL {
 
     }
 
-    // Get Balance factor of node N
+    /**
+     * Gets the balance factor of the given node.
+     *
+     * @param N the node to get the balance factor from.
+     * @return the balance factor of the node.
+     */
     int getBalance(Node N) {
         if (N == null)
             return 0;
@@ -91,6 +135,12 @@ class myAVL {
         return height(N.left) - height(N.right);
     }
 
+    /**
+     * Rebalances the AVL tree after insertion.
+     *
+     * @param node the root node of the subtree to be rebalanced.
+     * @return the new root of the subtree after rebalancing.
+     */
     private Node rebalance(Node node) {
         int balanceFactor = getBalance(node);
 
@@ -121,48 +171,59 @@ class myAVL {
         return node;
     }
 
-    // A utility function to print preorder traversal
-    // of the tree.
-    // The function also prints height of every node
+    /**
+     * Performs preorder traversal of the AVL tree and prints the nodes.
+     *
+     * @param node the root node of the subtree to be traversed.
+     */
     void preOrder(Node node) {
         if (node != null) {
 
-            System.out.println(node.key.getDate());
+            System.out.println(node.key.toString());
             preOrder(node.left);
             preOrder(node.right);
         }
 
     }
 
-    protected Node insert(Node node, SaleRecord key) {
+    /**
+     * Inserts a new SaleRecord node into the AVL tree while maintaining balance.
+     *
+     * @param node the current root node of the subtree.
+     * @param key  the SaleRecord object to be inserted.
+     * @return the new root of the subtree after insertion and rebalancing.
+     * @throws ParseException if the date strings cannot be parsed.
+     */
+    protected Node insert(Node node, SaleRecord key) throws ParseException {
 
         /* 1. Perform the normal BST insertion */
         if (node == null) {
             return (new Node(key));
         }
 
-        try {
-            // compare method not working right here, list of dates is not sorted (may have
-            // something to do with program7 class)
-            if (compare(node.key.getDate(), key.getDate())) {
-                // System.out.println(compare(node.key.getDate(), key.getDate()));
-                node.left = insert(node.left, key);
-                // ! this is what is wrong for some reason the code never reaches this code
-            } else if (!compare(node.key.getDate(), key.getDate())) {
-                // System.out.println(compare(key.getDate(), node.key.getDate()));
-                node.right = insert(node.right, key);
-            }
+        // try {
+        // compare method not working right here, list of dates is not sorted (may have
+        // something to do with program7 class)
+        if (compare(node.key.getDate(), key.getDate())) {
 
-            else { // Duplicate keys not allowed
-                return node;
-            }
-        } catch (ParseException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            // System.out.println(compare(node.key.getDate(), key.getDate()));
+            node.left = insert(node.left, key);
+        } else if (!compare(node.key.getDate(), key.getDate())) {
+            node.right = insert(node.right, key);
         }
+
+        else { // Duplicate keys not allowed
+            return node;
+        }
+        // } catch (ParseException e) {
+        // // TODO Auto-generated catch block
+        // e.printStackTrace();
+
         /* 2. Update height of this ancestor node */
-        node.height = 1 + max(height(node.left),
-                height(node.right));
+        node.height = 1 +
+
+                max(height(node.left),
+                        height(node.right));
 
         /*
          * 3. Get the balance factor of this ancestor
@@ -190,7 +251,7 @@ class myAVL {
             try {
                 if (compare(key.getDate(), node.right.key.getDate())) {
                     return leftRotate(node);
-                } else if (compare(key.getDate(), node.right.key.getDate())) {
+                } else if (compare(node.right.key.getDate(), key.getDate())) {
                     node.right = rightRotate(node.right);
                     return leftRotate(node);
                 }
