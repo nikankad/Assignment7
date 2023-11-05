@@ -1,10 +1,10 @@
 class Node {
-    int data, height;
+    int height;
+    SaleRecord key;
     Node left, right;
 
-    Node(int d) {
-        data = d;
+    Node(SaleRecord d) {
+        key = d;
         height = 1;
     }
 }
-

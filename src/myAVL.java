@@ -1,162 +1,197 @@
-public class myAVL {
-   Node root;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
-   //returns height of selected node (N : Node)
-   int height(Node N){
-    if(N == null){
-        return 0;
+class myAVL {
+    Node root;
+
+    int limit;
+
+    myAVL(int myLimit) {
+        limit = myLimit;
     }
 
-    return N.height;
-   }
+    // return true if date a is earlier than b
+    public boolean compare(String a, String b) throws ParseException {
 
-//  returns max of 2 numbers (a, b) : int
-   int max(int a, int b){
-    return(a>b) ? a:b;
-   }
+        try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            Date date1 = dateFormat.parse(a);
+            Date date2 = dateFormat.parse(b);
 
-   // updates height of Node N
-   private void updateHeight(Node N){
-    int leftChildHeight = height(N.left);
-    int rightChildHeight = height(N.right);
+            return date1.before(date2);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            // Handle the exception if the input strings are not in the correct format
+            return false;
+        }
+    }
 
-    N.height = max(leftChildHeight, rightChildHeight) + 1;
-   }
+    // A utility function to get the height of the tree
+    int height(Node N) {
+        if (N == null)
+            return 0;
 
-   // Balance factor (R, L, 2R, 2L)
-   public int balanceFactor(Node N){
+        return N.height;
+    }
+
+    // A utility function to get maximum of two integers
+    int max(int a, int b) {
+        return (a > b) ? a : b;
+    }
+
+    // A utility function to right rotate subtree rooted with y
+    // See the diagram given above.
+    Node rightRotate(Node y) {
+        Node x = y.left;
+        Node T2 = x.right;
+
+        // Perform rotation
+        x.right = y;
+        y.left = T2;
+
+        // Update heights
+        y.height = max(height(y.left), height(y.right)) + 1;
+        x.height = max(height(x.left), height(x.right)) + 1;
+
+        // Return new root
+        return x;
+    }
+
+    // A utility function to left rotate subtree rooted with x
+    // See the diagram given above.
+    Node leftRotate(Node x) {
+        Node y = x.right;
+        Node T2 = y.left;
+
+        // Perform rotation
+        y.left = x;
+        x.right = T2;
+
+        // Update heights
+        x.height = max(height(x.left), height(x.right)) + 1;
+        y.height = max(height(y.left), height(y.right)) + 1;
+
+        // Return new root
+        return y;
+
+    }
+
+    // Get Balance factor of node N
+    int getBalance(Node N) {
+        if (N == null)
+            return 0;
+
         return height(N.left) - height(N.right);
-   }
+    }
 
-// rotates node N right
-   private Node rotateRight(Node N){
-       Node leftChild = N.left;
-//diy
-       return leftChild;
-   }
-//  rotates node N left
-   private Node rotateLeft(Node N){
-       Node rightChild = N.right;
-//write yourself
-       return rightChild;
-   }
-// rebalences subtree from node 
-    private Node rebalance(Node N) {
-        int balanceFactor = balanceFactor(N);
+    private Node rebalance(Node node) {
+        int balanceFactor = getBalance(node);
 
-        // Left-heavy
+        // Left-heavy?
         if (balanceFactor < -1) {
-            if (balanceFactor(N.left) <= 0) {    // Case 1
+            if (getBalance(node.left) <= 0) { // Case 1
                 // Rotate right
-                N = rotateRight(N);
-            } else {                                // Case 2
+                node = rightRotate(node);
+            } else { // Case 2
                 // Rotate left-right
-                N.left = rotateLeft(N.left);
-                N = rotateRight(N);
+                node.left = leftRotate(node.left);
+                node = rightRotate(node);
             }
         }
 
         // Right-heavy?
         if (balanceFactor > 1) {
-            if (balanceFactor(N.right) >= 0) {    // Case 3
+            if (getBalance(node.right) >= 0) { // Case 3
                 // Rotate left
-                N = rotateLeft(N);
-            } else {                                 // Case 4
+                node = leftRotate(node);
+            } else { // Case 4
                 // Rotate right-left
-                N.right = rotateRight(N.right);
-                N = rotateLeft(N);
+                node.right = rightRotate(node.right);
+                node = leftRotate(node);
             }
         }
 
-        return N;
+        return node;
     }
 
+    // A utility function to print preorder traversal
+    // of the tree.
+    // The function also prints height of every node
+    void preOrder(Node node) {
+        if (node != null) {
 
-
-    Node insert(Node N, int data) {
-        // Step 1: Perform the normal BST insertion
-        if (N == null) {
-            return new Node(data);
+            System.out.println(node.key.getDate());
+            preOrder(node.left);
+            preOrder(node.right);
         }
 
-        if (data < N.data) {
-            N.left = insert(N.left, data);
-        } else if (data > N.data) {
-            N.right = insert(N.right, data);
-        } else {
-            // Duplicate data is not allowed in AVL tree, so do nothing
-            return N;
-        }
-
-        // Step 2: Update height of the current node
-        N.height = 1 + max(height(N.left), height(N.right));
-
-        // Step 3: Get the balance factor of this node to check if it is unbalanced
-        int balanceFactor = balanceFactor(N);
-
-        // Step 4: Perform rotations if the node is unbalanced
-        // Left Heavy (Left-Left case)
-        if (balanceFactor > 1 && data < N.left.data) {
-            return rotateRight(N);
-        }
-        // Right Heavy (Right-Right case)
-        if (balanceFactor < -1 && data > N.right.data) {
-            return rotateLeft(N);
-        }
-        // Left Heavy (Left-Right case)
-        if (balanceFactor > 1 && data > N.left.data) {
-            N.left = rotateLeft(N.left);
-            return rotateRight(N);
-        }
-        // Right Heavy (Right-Left case)
-        if (balanceFactor < -1 && data < N.right.data) {
-            N.right = rotateRight(N.right);
-            return rotateLeft(N);
-        }
-
-        // If the node is balanced, return it
-        return N;
     }
 
+    protected Node insert(Node node, SaleRecord key) {
 
-
-    void preOrder(Node N) {
-        if (N != null) {
-            System.out.print(N.data + " ");
-            preOrder(N.left);
-            preOrder(N.right);
+        /* 1. Perform the normal BST insertion */
+        if (node == null) {
+            return (new Node(key));
         }
+
+        try {
+            // compare method not working right here, list of dates is not sorted (may have
+            // something to do with program7 class)
+            if (compare(node.key.getDate(), key.getDate())) {
+                // System.out.println(node.key.getDate() + " " + key.getDate());
+                node.left = insert(node.left, key);
+            } else if (compare(key.getDate(), node.key.getDate())) {
+
+                node.right = insert(node.right, key);
+            }
+
+            else { // Duplicate keys not allowed
+                return node;
+            }
+        } catch (ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        /* 2. Update height of this ancestor node */
+        node.height = 1 + max(height(node.left),
+                height(node.right));
+
+        /*
+         * 3. Get the balance factor of this ancestor
+         * node to check whether this node became
+         * unbalanced
+         */
+        int balance = getBalance(node);
+
+        // If this node becomes unbalanced, then there
+        // are 4 cases Left Left Case
+        if (balance > limit) {
+            try {
+                if (compare(key.getDate(), node.left.key.getDate())) {
+                    return rightRotate(node);
+                } else if (compare(node.left.key.getDate(), key.getDate())) {
+                    node.left = leftRotate(node.left);
+                    return rightRotate(node);
+                }
+            } catch (ParseException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        if (balance < -limit) {
+            try {
+                if (compare(key.getDate(), node.right.key.getDate())) {
+                    return leftRotate(node);
+                } else if (compare(key.getDate(), node.right.key.getDate())) {
+                    node.right = rightRotate(node.right);
+                    return leftRotate(node);
+                }
+            } catch (ParseException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        return node;
     }
-
-    
-
-
-    public static void main(String[] args) {
-        myAVL tree = new myAVL();
-
-        /* Constructing tree given in the above figure */
-        tree.root = tree.insert(tree.root, 10);
-        tree.root = tree.insert(tree.root, 20);
-        tree.root = tree.insert(tree.root, 30);
-        tree.root = tree.insert(tree.root, 40);
-        tree.root = tree.insert(tree.root, 50);
-        tree.root = tree.insert(tree.root, 25);
-        
-        /* The constructed AVL Tree would be
-             30
-            /  \
-          20   40
-         /  \     \
-        10  25    50
-        */
-        System.out.println("Preorder traversal" +
-                " of constructed tree is : ");
-        tree.preOrder(tree.root);
-    }
-
-
-
-
-
-
 }
