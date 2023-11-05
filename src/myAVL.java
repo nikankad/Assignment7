@@ -19,7 +19,13 @@ class myAVL {
             Date date1 = dateFormat.parse(a);
             Date date2 = dateFormat.parse(b);
 
-            return date1.before(date2);
+            if (date1.before(date2)) {
+                // System.out.println(true);
+                return true;
+            } else {
+                // System.out.println(false);
+                return false;
+            }
         } catch (ParseException e) {
             e.printStackTrace();
             // Handle the exception if the input strings are not in the correct format
@@ -139,10 +145,11 @@ class myAVL {
             // compare method not working right here, list of dates is not sorted (may have
             // something to do with program7 class)
             if (compare(node.key.getDate(), key.getDate())) {
-                // System.out.println(node.key.getDate() + " " + key.getDate());
+                // System.out.println(compare(node.key.getDate(), key.getDate()));
                 node.left = insert(node.left, key);
-            } else if (compare(key.getDate(), node.key.getDate())) {
-
+                // ! this is what is wrong for some reason the code never reaches this code
+            } else if (!compare(node.key.getDate(), key.getDate())) {
+                // System.out.println(compare(key.getDate(), node.key.getDate()));
                 node.right = insert(node.right, key);
             }
 
