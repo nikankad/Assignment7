@@ -5,7 +5,7 @@ import java.text.ParseException;
 import java.util.TreeMap;
 
 public class program7 {
-    
+
     /** 
      * @param args
      * @throws ParseException
@@ -22,7 +22,7 @@ public class program7 {
             br.readLine(); // Skip the header row
 
             while ((line = br.readLine()) != null) {
-                String[] data = line.split(",");
+               s String[] data = line.split(",");
                 // Assuming the order of columns in the CSV matches the constructor parameters
                 final SaleRecord saleRecord = new SaleRecord(data[0], data[1], data[2], data[3],
                         data[4], Integer.parseInt(data[5]), Double.parseDouble(data[6]), Double.parseDouble(data[7]),

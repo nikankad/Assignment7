@@ -27,8 +27,8 @@ class myAVL {
      * Compares two date strings and returns true if the first date is earlier than
      * the second date.
      *
-     * @param a the first date string.
-     * @param b the second date string.
+     * @param a the first date string.`
+     * @param db the second date string.
      * @return true if the first date is earlier than the second date, false
      *         otherwise.
      * @throws ParseException if the input strings are not in the correct date
