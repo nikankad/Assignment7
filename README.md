@@ -10,3 +10,8 @@ This Java program implements an AVL tree for storing SaleRecord objects based on
 - **Date Comparison**: Utilizes date comparison logic to order SaleRecord objects within the tree.
 - **Balancing**: Automatically rebalances the tree after insertion to maintain its balanced nature.
 - **Preorder Traversal**: Provides a preorder traversal function to print the SaleRecord nodes.
+
+# Repo
+
+<a href="https://github.com/nikankad/Assignment7
+" target="_blank">Link</a>
